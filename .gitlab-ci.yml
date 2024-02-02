@@ -1,0 +1,73 @@
+variables:
+  MOPS_WEB_CMS: registry.mopssys.com/mops-4.0/containers/mops-ui-cms
+  YARN_ENABLE_IMMUTABLE_INSTALLS: 'false'
+  UPSTREAM_CI_PROJECT_PATH: $CI_PROJECT_PATH
+  UPSTREAM_CI_PROJECT_NAME: $CI_PROJECT_NAME
+  UPSTREAM_CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+  UPSTREAM_CI_COMMIT_REF_NAME: $CI_COMMIT_REF_NAME
+  UPSTREAM_CI_MERGE_REQUEST_SOURCE_BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+  UPSTREAM_CI_MERGE_REQUEST_TARGET_BRANCH_NAME: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+  UPSTREAM_CI_MERGE_REQUEST_ID: $CI_OPEN_MERGE_REQUESTS
+  BUILD_MODE: "development"
+
+default:
+  before_script:
+    - . $env:VCENV_PS1
+    - docker login -u $env:MOPSBM_USER -p $env:MOPSBM_CI_TOKEN $env:CI_REGISTRY
+
+stages:
+  - build
+  - package
+  - deploy
+
+build:
+  stage: build
+  script:
+    - yarn
+    - yarn workspace cms tsc
+    # - yarn workspace cms test
+    - yarn workspace cms lint
+    - .\fixCoverageRefs.ps1
+    - .\dobuild.ps1
+  artifacts:
+    paths:
+      - ./apps/*/dist/*
+      - ./apps/*/node/*
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: '**/coverage/cobertura-coverage.xml'
+      junit: '**/junit.xml'
+  tags:
+    - mops4.0v2-build
+
+package-2019:
+  stage: package
+  script:
+    - cd apps/cms
+    - .\updateVersion.ps1
+    - if(-Not (test-path "./doc/en")) { copy-item "./doc/en/*" "./doc/en/cms/" -recurse }
+    - docker build --build-arg base_image=registry.mopssys.com/mops-4.0/containers/mops-nodejs:latest-2019 -t $env:MOPS_WEB_CMS .
+    - c:\buildtools\pushimage.ps1 $env:MOPS_WEB_CMS
+    - c:\buildtools\pushimage-os.ps1 $env:MOPS_WEB_CMS W2019
+    - remove-item "./doc/" -recurse -force
+  tags:
+    - mops4.0v2-build
+
+package-2022:
+  stage: package
+  script:
+    - cd apps/cms
+    - .\updateVersion.ps1
+    - if(-Not (test-path "./doc/en")) { copy-item "./doc/en/*" "./doc/en/cms/" -recurse }
+    - docker build --build-arg base_image=registry.mopssys.com/mops-4.0/containers/mops-nodejs:latest-2022 -t $env:MOPS_WEB_CMS .
+    - c:\buildtools\pushimage-os.ps1 $env:MOPS_WEB_CMS W2022
+    - remove-item "./doc/" -recurse -force
+  tags:
+    - W2022
+
+deploy:
+  stage: deploy
+  trigger:
+    project: mops-4.0/systems/mops40-deploy
+    branch: master

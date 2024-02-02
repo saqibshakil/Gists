@@ -1,0 +1,19 @@
+{
+  "git.ignoreLimitWarning": true,
+  "eslint.nodePath": "C:\\Program Files\\nodejs",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "html",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
+    "./apps/cms"
+  ],
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "cSpell.words": [
+    "jsonata",
+    "refetched"
+  ]
+}

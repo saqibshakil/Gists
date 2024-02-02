@@ -1,0 +1,43 @@
+{
+  "name": "mops-web",
+  "version": "0.0.0",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "build": "yarn workspace cms build",
+    "start:cms": "yarn workspace cms start",
+    "start:prod:cms": "yarn workspace cms start -p --mode=production",
+    "start": "yarn start:cms",
+    "lint:cms": "yarn workspace cms lint",
+    "tsc:cms": "yarn workspace cms tsc",
+    "pre-commit": "npm-run-all -s prettify preprep",
+    "prettify": "pretty-quick --staged --no-semi",
+    "prettify:write": "prettier --no-semi --write \"apps/**/src/**/*.js\" \"apps/**/src/**/*.ts\" \"apps/**/src/**/*.tsx\"",
+    "prettify:check": "prettier --check --no-semi  \"apps/**/src/**/*.js\" \"apps/**/src/**/*.ts\" \"apps/**/src/**/*.tsx\"",
+    "lint": "yarn lint:cms",
+    "lint:check": "eslint .",
+    "lint:debug": "eslint --fix . --debug",
+    "preprep": "npm-run-all -s prettify:write lint",
+    "prep": "npm-run-all -s preprep test",
+    "test:cms": "yarn workspace cms test --watch",
+    "test": "yarn test:cms"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "plugin:jsx-a11y/recommended"
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "js-convert-case": "^4.1.2",
+    "memoize-one": "6.0.0"
+  },
+  "devDependencies": {
+    "terser-brunch": "^4.1.0",
+    "tslib": "2.3.1"
+  }
+}

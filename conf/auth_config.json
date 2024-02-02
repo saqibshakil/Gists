@@ -1,0 +1,19 @@
+{
+    "issuer": "https://adfs.mopsmobile.com/adfs",
+    "client_id": "MOPS4.0V2.0_TEST",
+    "redirect_uri": "https://v2.0-dev.mops4.mopssys.com/callback",
+    "post_logout_redirect_uri": "https://v2.0-dev.mops4.mopssys.com",
+    "rootPath": "",
+    "response_type": "code",
+    "scope": "openid profile",
+    "load_user_info": false,
+    "customMetaDataEnabled": false,
+    "userManagerSettings": {
+        "includeIdTokenInSilentRenew": true,
+        "accessTokenExpiringNotificationTime": 60
+    },
+    "log": {
+        "type": "console",
+        "level": 4
+    }
+}
